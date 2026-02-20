@@ -53,18 +53,50 @@ function updateDashboard() {
     });
 }
 
-// Buttons
+// Set Budget Button Patch
 document.getElementById("setBudgetBtn").addEventListener("click", () => {
-    const budget = parseFloat(prompt("Enter total budget:"));
-    if (!isNaN(budget) && budget >= 0) totalBudget = budget;
+    const budgetStr = prompt("Enter total budget:");
+    const budget = parseFloat(budgetStr);
+
+    if (isNaN(budget) || budget < 0) {
+        alert("Invalid budget. Please enter a positive number.");
+        return;
+    }
+
+    if (budget < totalExpenses) {
+        alert(`Budget cannot be less than current total expenses (₱${totalExpenses.toFixed(2)}).`);
+        return;
+    }
+
+    totalBudget = budget;
     updateDashboard();
 });
 
+// Add Expense Button Patch
 document.getElementById("addExpenseBtn").addEventListener("click", () => {
     const category = prompt("Enter category (Food, Transport, School Supplies):");
-    const amount = parseFloat(prompt("Enter expense amount:"));
+    if (!category) return;
+
     const exp = expenses.find(e => e.category.toLowerCase() === category.toLowerCase());
-    if (exp && !isNaN(amount) && amount >= 0) exp.amount += amount;
+    if (!exp) {
+        alert("Invalid category. Please choose Food, Transport, or School Supplies.");
+        return;
+    }
+
+    const amountStr = prompt(`Enter expense amount for ${exp.category}:`);
+    const amount = parseFloat(amountStr);
+
+    if (isNaN(amount) || amount < 0) {
+        alert("Invalid amount. Please enter a positive number.");
+        return;
+    }
+
+    // Optional: prevent expense from exceeding budget
+    if (totalExpenses + amount > totalBudget) {
+        alert("Warning: This expense exceeds your total budget!");
+    }
+
+    exp.amount += amount; // keep accumulation behavior
     updateDashboard();
 });
 
