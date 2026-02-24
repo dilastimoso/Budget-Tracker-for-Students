@@ -1,81 +1,14 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    margin: 0;
-    padding: 20px;
-}
+/* Keeping your layout exactly as the wireframe shows */
+body { font-family: sans-serif; margin: 0; padding: 20px; }
+nav { display: flex; justify-content: space-between; border: 1px solid black; padding: 10px; margin-bottom: 20px; }
+.summary-cards { display: flex; gap: 10px; margin-bottom: 20px; }
+.card { flex: 1; border: 1px solid black; height: 100px; display: flex; align-items: center; justify-content: center; }
+.main-content { display: flex; gap: 10px; margin-bottom: 20px; }
+.chart-box { flex: 2; border: 1px solid black; padding: 10px; }
+.list-box { flex: 1; border: 1px solid black; padding: 10px; }
+.actions { display: flex; justify-content: center; gap: 20px; border: 1px solid black; padding: 20px; }
 
-.container {
-    max-width: 1000px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-header {
-    text-align: center;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-
-.input-section, .display-section {
-    margin-top: 20px;
-}
-
-form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-input, select, button {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-button {
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    border: none;
-}
-
-button:hover {
-    background-color: #218838;
-}
-
-.display-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-/* FIXED: Added specific constraints for the chart container */
-.chart-container {
-    position: relative;
-    height: 300px; /* Fixed height stops the expansion loop */
-    width: 100%;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    background: #f9f9f9;
-    margin-bottom: 5px;
-    padding: 10px;
-    border-left: 5px solid #28a745;
-    display: flex;
-    justify-content: space-between;
-}
-
-@media (max-width: 768px) {
-    .display-section {
-        grid-template-columns: 1fr;
-    }
+/* PATCH: This stops the canvas from physically expanding the .chart-box */
+#expenseChart {
+    max-height: 400px !important;
 }
