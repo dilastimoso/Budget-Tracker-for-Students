@@ -1,103 +1,69 @@
-let totalBudget = 0;
-let totalExpenses = 0;
-let remainingBalance = 0;
+let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+let myChart;
 
-let expenses = [
-    { category: "Food", amount: 0 },
-    { category: "Transport", amount: 0 },
-    { category: "School Supplies", amount: 0 }
-];
+const form = document.getElementById('transaction-form');
+const list = document.getElementById('transaction-list');
+const balanceDisplay = document.getElementById('total-balance');
 
-const totalBudgetEl = document.getElementById("totalBudget");
-const totalExpensesEl = document.getElementById("totalExpenses");
-const remainingBalanceEl = document.getElementById("remainingBalance");
-const expenseListEl = document.getElementById("expenseList");
+function updateUI() {
+    list.innerHTML = '';
+    let total = 0;
+    const categoryData = {
+        Food: 0, Transport: 0, Education: 0, 
+        Entertainment: 0, Utilities: 0, Other: 0
+    };
 
-// Chart setup
-const ctx = document.getElementById('expenseChart').getContext('2d');
-const expenseChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: expenses.map(e => e.category),
-        datasets: [{
-            label: 'Expenses',
-            data: expenses.map(e => e.amount),
-            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-        }]
-    },
-    options: { responsive: true, maintainAspectRatio: false }
-});
+    transactions.forEach((t, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${t.description} - ₱${t.amount.toFixed(2)} <span>${t.category}</span>`;
+        list.appendChild(li);
+        total += t.amount;
+        categoryData[t.category] += t.amount;
+    });
 
-function updateDashboard() {
-    totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
-    remainingBalance = totalBudget - totalExpenses;
+    balanceDisplay.innerText = `₱${total.toFixed(2)}`;
+    updateChart(categoryData);
+    localStorage.setItem('transactions', JSON.stringify(transactions));
+}
 
-    totalBudgetEl.innerText = `₱${totalBudget.toFixed(2)}`;
-    totalExpensesEl.innerText = `₱${totalExpenses.toFixed(2)}`;
-    remainingBalanceEl.innerText = `₱${remainingBalance.toFixed(2)}`;
+function updateChart(data) {
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    
+    if (myChart) {
+        myChart.destroy();
+    }
 
-    // Update chart
-    expenseChart.data.datasets[0].data = expenses.map(e => e.amount);
-    expenseChart.update();
-
-    // Update list
-    expenseListEl.innerHTML = "";
-    expenses.forEach(e => {
-        const li = document.createElement("li");
-        li.className = "list-group-item d-flex justify-content-between";
-        li.innerText = e.category;
-        const span = document.createElement("span");
-        span.innerText = `₱${e.amount.toFixed(2)}`;
-        li.appendChild(span);
-        expenseListEl.appendChild(li);
+    myChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(data),
+            datasets: [{
+                data: Object.values(data),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // FIXED: Allows the chart to follow CSS height
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
     });
 }
 
-// Set Budget Button Patch
-document.getElementById("setBudgetBtn").addEventListener("click", () => {
-    const budgetStr = prompt("Enter total budget:");
-    const budget = parseFloat(budgetStr);
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const description = document.getElementById('description').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+    const category = document.getElementById('category').value;
 
-    if (isNaN(budget) || budget < 0) {
-        alert("Invalid budget. Please enter a positive number.");
-        return;
-    }
-
-    if (budget < totalExpenses) {
-        alert(`Budget cannot be less than current total expenses (₱${totalExpenses.toFixed(2)}).`);
-        return;
-    }
-
-    totalBudget = budget;
-    updateDashboard();
+    transactions.push({ description, amount, category });
+    updateUI();
+    form.reset();
 });
 
-// Add Expense Button Patch
-document.getElementById("addExpenseBtn").addEventListener("click", () => {
-    const category = prompt("Enter category (Food, Transport, School Supplies):");
-    if (!category) return;
-
-    const exp = expenses.find(e => e.category.toLowerCase() === category.toLowerCase());
-    if (!exp) {
-        alert("Invalid category. Please choose Food, Transport, or School Supplies.");
-        return;
-    }
-
-    const amountStr = prompt(`Enter expense amount for ${exp.category}:`);
-    const amount = parseFloat(amountStr);
-
-    if (isNaN(amount) || amount < 0) {
-        alert("Invalid amount. Please enter a positive number.");
-        return;
-    }
-
-    // Optional: prevent expense from exceeding budget
-    if (totalExpenses + amount > totalBudget) {
-        alert("Warning: This expense exceeds your total budget!");
-    }
-
-    exp.amount += amount; // keep accumulation behavior
-    updateDashboard();
-});
-
-updateDashboard();
+// Initial Load
+updateUI();
