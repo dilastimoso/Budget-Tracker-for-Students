@@ -9,38 +9,49 @@
 </head>
 <body>
     <nav>
-        <div class="nav-left">App Name / Logo</div>
+        <div class="nav-left"><strong>StudentBudget</strong></div>
         <div class="nav-center">Dashboard</div>
         <div class="nav-right">
-            <button>Profile</button>
-            <button>Logout</button>
+            <button class="nav-btn" onclick="alert('Profile coming soon!')">Profile</button>
+            <button class="nav-btn logout" onclick="location.reload()">Logout</button>
         </div>
     </nav>
 
     <div class="summary-cards">
-        <div class="card">Total Budget</div>
-        <div class="card">Total Expenses</div>
-        <div class="card">Remaining Balance</div>
+        <div class="card">
+            <small>Total Budget</small>
+            <h2 id="display-budget">₱0.00</h2>
+        </div>
+        <div class="card">
+            <small>Total Expenses</small>
+            <h2 id="display-expenses">₱0.00</h2>
+        </div>
+        <div class="card">
+            <small>Remaining Balance</small>
+            <h2 id="display-balance">₱0.00</h2>
+        </div>
     </div>
 
     <div class="main-content">
         <div class="chart-box">
-            <canvas id="expenseChart" height="400"></canvas>
+            <h3>Expense Summary</h3>
+            <div class="chart-container">
+                <canvas id="expenseChart"></canvas>
+            </div>
         </div>
         <div class="list-box">
             <h3>Expense List</h3>
             <ul id="expense-list">
-                <li>Food</li>
-                <li>Transport</li>
-                <li>School Supplies</li>
-            </ul>
+                </ul>
         </div>
     </div>
 
     <div class="actions">
-        <button id="add-expense">Add Expense</button>
-        <button id="set-budget">Set Budget</button>
+        <button id="add-expense-btn" class="action-btn main">Add Expense</button>
+        <button id="set-budget-btn" class="action-btn secondary">Set Budget</button>
     </div>
+
+    <div id="rfid-status" class="rfid-toast">Waiting for RFID Scan... (Press 'Enter' to Simulate)</div>
 
     <script src="script.js"></script>
 </body>
