@@ -1,16 +1,13 @@
-// State Management 
 let budget = parseFloat(localStorage.getItem('budget')) || 0; 
 let expenses = JSON.parse(localStorage.getItem('expenses')) || []; 
 let myChart; 
 
-// DOM Elements 
 const budgetDisplay = document.getElementById('display-budget'); 
 const expenseDisplay = document.getElementById('display-expenses'); 
 const balanceDisplay = document.getElementById('display-balance'); 
 const expenseList = document.getElementById('expense-list'); 
 const rfidStatus = document.getElementById('rfid-status'); 
 
-// Initialize 
 function init() { 
     updateUI(); 
     setupEventListeners(); 
@@ -75,11 +72,10 @@ function updateUI() {
     balanceDisplay.innerText = `₱${balance.toLocaleString()}`; 
     balanceDisplay.parentElement.style.color = balance < 0 ? "#e74c3c" : "#2ecc71"; 
 
-    // Update List with dynamic DELETE buttons (Feature 2 Patch)
     expenseList.innerHTML = expenses.map((e, index) => ` 
         <li> 
             <span><strong>${e.desc}</strong><br><small>${e.date}</small></span> 
-            <span>₱${e.amt} <button onclick="deleteExpense(${index})" style="background:none; color:#e74c3c; padding:0; margin-left:10px;">✕</button></span> 
+            <span>₱${e.amt} <button onclick="deleteExpense(${index})" style="background:none; color:#e74c3c; padding:0; margin-left:10px; font-size:1.2rem;">✕</button></span> 
         </li> 
     `).reverse().join(''); 
 
@@ -104,14 +100,30 @@ function updateChart() {
         options: { 
             responsive: true, 
             maintainAspectRatio: false, 
-            plugins: { legend: { position: 'bottom' } } 
+            plugins: { 
+                legend: { 
+                    position: 'bottom',
+                    labels: {
+                        font: {
+                            size: 16
+                        },
+                        padding: 20
+                    }
+                },
+                tooltip: {
+                    bodyFont: {
+                        size: 18
+                    },
+                    titleFont: {
+                        size: 18
+                    },
+                    padding: 15
+                }
+            } 
         } 
     }); 
 } 
 
-// --- START OF PROGRESS REPORT PATCHES ---
-
-// Feature: Individual Delete function
 function deleteExpense(index) {
     if(confirm("Delete this entry?")) {
         expenses.splice(index, 1);
@@ -120,7 +132,6 @@ function deleteExpense(index) {
     }
 }
 
-// Feature: Clear All Reset function
 const clearBtn = document.createElement('button');
 clearBtn.innerText = "Clear All";
 clearBtn.className = "nav-btn logout";
@@ -133,15 +144,14 @@ clearBtn.onclick = () => {
 };
 document.querySelector('.actions').appendChild(clearBtn);
 
-// Feature: Profile Modal (Replaces old alert)
 document.getElementById('profile-trigger').onclick = () => {
     const modal = document.createElement('div');
-    modal.style = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:30px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.2);z-index:10001;text-align:center;min-width:300px;";
+    modal.style = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:40px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.2);z-index:10001;text-align:center;min-width:350px;font-size:1.2rem;";
     modal.innerHTML = `
-        <h3 style="margin-top:0">Student Profile</h3>
+        <h3 style="margin-top:0;font-size:1.8rem;">Student Profile</h3>
         <p><strong>Names:</strong><br>Dennis Isaiah Lastimoso<br>Karyl Kaye P. Tumala</p>
         <p><strong>Project:</strong> CS-01</p>
-        <button onclick="this.parentElement.remove()" style="background:#4a90e2;color:white;border-radius:5px;width:100%">Close</button>
+        <button onclick="this.parentElement.remove()" style="background:#4a90e2;color:white;border-radius:5px;width:100%;padding:15px;font-size:1.2rem;cursor:pointer;border:none;margin-top:15px;">Close</button>
     `;
     document.body.appendChild(modal);
 };
