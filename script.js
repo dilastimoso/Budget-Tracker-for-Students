@@ -8,7 +8,39 @@ const balanceDisplay = document.getElementById('display-balance');
 const expenseList = document.getElementById('expense-list'); 
 const rfidStatus = document.getElementById('rfid-status'); 
 
+function checkAuth() {
+    const user = localStorage.getItem('currentUser');
+    if (!user) {
+        const loginOverlay = document.createElement('div');
+        loginOverlay.id = 'login-overlay';
+        loginOverlay.style = "position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;";
+        loginOverlay.innerHTML = `
+            <div style="background:white;padding:40px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;">
+                <h2>Welcome to StudentBudget</h2>
+                <p>Please enter your name to login:</p>
+                <input type="text" id="login-name" style="padding:10px;font-size:1.2rem;width:80%;margin-bottom:20px;border:1px solid #ccc;border-radius:5px;">
+                <br>
+                <button id="login-btn" style="background:#2ecc71;color:white;padding:12px 30px;font-size:1.2rem;border:none;border-radius:5px;cursor:pointer;">Login</button>
+            </div>
+        `;
+        document.body.appendChild(loginOverlay);
+        document.getElementById('login-btn').onclick = () => {
+            const name = document.getElementById('login-name').value.trim();
+            if (name) {
+                localStorage.setItem('currentUser', name);
+                document.getElementById('login-overlay').remove();
+                init();
+            } else {
+                alert("Please enter a name.");
+            }
+        };
+        return false;
+    }
+    return true;
+}
+
 function init() { 
+    if (!checkAuth()) return;
     updateUI(); 
     setupEventListeners(); 
 } 
@@ -46,6 +78,14 @@ function setupEventListeners() {
             simulateRFIDScan(); 
         } 
     }); 
+
+    document.querySelector('.logout').onclick = (e) => {
+        e.preventDefault();
+        if(confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        }
+    };
 } 
 
 function simulateRFIDScan() { 
@@ -145,22 +185,39 @@ clearBtn.className = "nav-btn logout";
 clearBtn.style.marginLeft = "10px";
 clearBtn.onclick = () => {
     if(confirm("Reset everything?")) {
-        localStorage.clear();
+        localStorage.removeItem('budget');
+        localStorage.removeItem('expenses');
         location.reload();
     }
 };
 document.querySelector('.actions').appendChild(clearBtn);
 
 document.getElementById('profile-trigger').onclick = () => {
+    const currentUser = localStorage.getItem('currentUser') || "";
     const modal = document.createElement('div');
     modal.style = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:40px;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.2);z-index:10001;text-align:center;min-width:350px;font-size:1.2rem;";
     modal.innerHTML = `
         <h3 style="margin-top:0;font-size:1.8rem;">Student Profile</h3>
-        <p><strong>Names:</strong><br>Dennis Isaiah Lastimoso<br>Karyl Kaye P. Tumala</p>
+        <div style="margin-bottom: 15px; text-align: left;">
+            <strong>Name:</strong><br>
+            <input type="text" id="edit-profile-name" value="${currentUser}" style="padding:10px;font-size:1.1rem;width:100%;box-sizing:border-box;margin-top:5px;border:1px solid #ccc;border-radius:5px;">
+        </div>
         <p><strong>Project:</strong> CS-01</p>
-        <button onclick="this.parentElement.remove()" style="background:#4a90e2;color:white;border-radius:5px;width:100%;padding:15px;font-size:1.2rem;cursor:pointer;border:none;margin-top:15px;">Close</button>
+        <button id="save-profile-btn" style="background:#2ecc71;color:white;border-radius:5px;width:100%;padding:15px;font-size:1.2rem;cursor:pointer;border:none;margin-top:10px;">Save Profile</button>
+        <button onclick="this.parentElement.remove()" style="background:#e74c3c;color:white;border-radius:5px;width:100%;padding:15px;font-size:1.2rem;cursor:pointer;border:none;margin-top:10px;">Close</button>
     `;
     document.body.appendChild(modal);
+
+    document.getElementById('save-profile-btn').onclick = () => {
+        const newName = document.getElementById('edit-profile-name').value.trim();
+        if(newName) {
+            localStorage.setItem('currentUser', newName);
+            alert("Profile saved successfully!");
+            modal.remove();
+        } else {
+            alert("Name cannot be empty.");
+        }
+    };
 };
 
 init();
