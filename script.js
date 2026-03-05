@@ -16,17 +16,29 @@ function init() {
 function setupEventListeners() { 
     document.getElementById('set-budget-btn').onclick = () => { 
         const val = prompt("Enter Monthly Budget:", budget); 
-        if (val) { 
-            budget = parseFloat(val); 
-            localStorage.setItem('budget', budget); 
-            updateUI(); 
+        if (val !== null && val.trim() !== "") { 
+            const parsed = parseFloat(val);
+            if (!isNaN(parsed)) {
+                budget = parsed; 
+                localStorage.setItem('budget', budget); 
+                updateUI(); 
+            } else {
+                alert("Please enter a valid number for the budget.");
+            }
         } 
     }; 
 
     document.getElementById('add-expense-btn').onclick = () => { 
         const desc = prompt("Expense Description:"); 
         const amt = prompt("Amount:"); 
-        if (desc && amt) addExpense(desc, parseFloat(amt), "Manual"); 
+        if (desc && amt) {
+            const parsedAmt = parseFloat(amt);
+            if (!isNaN(parsedAmt)) {
+                addExpense(desc, parsedAmt, "Manual"); 
+            } else {
+                alert("Please enter a valid number for the amount.");
+            }
+        }
     }; 
 
     window.addEventListener('keydown', (e) => { 
@@ -66,16 +78,17 @@ function addExpense(desc, amt, cat) {
 function updateUI() { 
     const totalExp = expenses.reduce((sum, e) => sum + e.amt, 0); 
     const balance = budget - totalExp; 
+    const formatOptions = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
 
-    budgetDisplay.innerText = `₱${budget.toLocaleString()}`; 
-    expenseDisplay.innerText = `₱${totalExp.toLocaleString()}`; 
-    balanceDisplay.innerText = `₱${balance.toLocaleString()}`; 
+    budgetDisplay.innerText = `₱${budget.toLocaleString('en-US', formatOptions)}`; 
+    expenseDisplay.innerText = `₱${totalExp.toLocaleString('en-US', formatOptions)}`; 
+    balanceDisplay.innerText = `₱${balance.toLocaleString('en-US', formatOptions)}`; 
     balanceDisplay.parentElement.style.color = balance < 0 ? "#e74c3c" : "#2ecc71"; 
 
     expenseList.innerHTML = expenses.map((e, index) => ` 
         <li> 
             <span><strong>${e.desc}</strong><br><small>${e.date}</small></span> 
-            <span>₱${e.amt} <button onclick="deleteExpense(${index})" style="background:none; color:#e74c3c; padding:0; margin-left:10px; font-size:1.2rem;">✕</button></span> 
+            <span>₱${e.amt.toLocaleString('en-US', formatOptions)} <button onclick="deleteExpense(${index})" style="background:none; color:#e74c3c; padding:0; margin-left:10px; font-size:1.2rem;">✕</button></span> 
         </li> 
     `).reverse().join(''); 
 
@@ -104,19 +117,13 @@ function updateChart() {
                 legend: { 
                     position: 'bottom',
                     labels: {
-                        font: {
-                            size: 16
-                        },
+                        font: { size: 16 },
                         padding: 20
                     }
                 },
                 tooltip: {
-                    bodyFont: {
-                        size: 18
-                    },
-                    titleFont: {
-                        size: 18
-                    },
+                    bodyFont: { size: 18 },
+                    titleFont: { size: 18 },
                     padding: 15
                 }
             } 
