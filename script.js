@@ -17,7 +17,7 @@ function checkAuth() {
         loginOverlay.innerHTML = `
             <div style="background:white;padding:40px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;">
                 <h2>Welcome to Student Budget Tracker</h2>
-                <p>Please enter your name to login:</p>
+                <p>Enter your name</p>
                 <input type="text" id="login-name" style="padding:10px;font-size:1.2rem;width:80%;margin-bottom:20px;border:1px solid #ccc;border-radius:5px;">
                 <br>
                 <button id="login-btn" style="background:#2ecc71;color:white;padding:12px 30px;font-size:1.2rem;border:none;border-radius:5px;cursor:pointer;">Login</button>
